@@ -1,12 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Author: Louie Chen <louie23 _at_ lavabit com>
 # License: GPL-3+
 # Description: This script will generate knockd one_time_sequences file
-
-
-function random() {
-	echo $(seq $1 $2 | shuf -n 1)
-}
 
 line=10
 port_min=1024
@@ -78,21 +73,24 @@ fi
 
 while [ $count -gt "0" ]
 do
-	echo -n " $(($line+1-$count))"
-	times=$(random $item_min $item_max)
-
+	times=`shuf -i$item_min-$item_max -n1`
 	for (( i = 1; i < $times; i++ ))
-	do
-		number=$(random $port_min $port_max)
-		echo -n ",$number"
-
+    do
+		number=`shuf -i$port_min-$port_max -n1`
+        if [ $udp == 0 ]
+        then
+            echo -n "T:$number "
+        fi
 		if [ $udp == 1 ]
-		then
-			tcpORudp=$(random 1 2)
-
+        then
+			tcpORudp=`shuf -i1-2 -n1`
+            if [ "$tcpORudp" == 1 ]
+            then
+				echo -n "T:$number "
+			fi
 			if [ "$tcpORudp" == 2 ]
-			then
-				echo -n ":udp"
+            then
+				echo -n "U:$number "
 			fi
 		fi
 	done
